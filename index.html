@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Haraji — Tax for MSMEs</title>
+
+  <!-- Chart.js for dashboard chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#69be6d" />
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- Header -->
+    <header class="app-header">
+    <div class="logo-title">
+    <img src="icons/H icon-2.png" alt="Haraji Logo" class="app-logo"> <h1 id="app-title">Haraji</h1>
+      </div>
+    
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="lang-toggle" role="group" aria-label="Language toggle">
+          <button id="lang-en" class="active">EN</button>
+          <button id="lang-ha">HA</button>
+        </div>
+
+        <button id="btn-theme" title="Toggle theme" class="icon-btn">🌗</button>
+        <div id="user-greet" class="muted" style="font-size:13px;"></div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main id="main">
+
+      <!-- AUTH -->
+      <section id="auth-screen" class="padded">
+        <div class="auth-box">
+          <h2 id="auth-title">Welcome to Haraji</h2>
+          <p id="auth-sub" class="muted">Login or sign up to get started</p>
+
+          <input id="email" class="auth-input" type="email" placeholder="Email" />
+          <input id="password" class="auth-input" type="password" placeholder="Password" />
+          <input id="fullname" class="auth-input hidden" type="text" placeholder="Full name (Sign up)" />
+
+          <div style="display:flex;gap:8px;">
+            <button id="btn-toggle-signup" class="big-btn" style="flex:1;background:#1565c0;">Sign up</button>
+            <button id="btn-login" class="big-btn" style="flex:1;background:#2E7D32;">Login</button>
+          </div>
+
+          <p class="center muted mt8">or continue as guest (demo)</p>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button id="btn-guest" class="big-btn" style="flex:1;background:#9e9e9e;">Continue Demo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard-screen" class="hidden">
+        <div class="summary" aria-hidden="false">
+          <div class="card">
+            <div id="lbl-sales" class="label">Total Sales</div>
+            <div id="val-sales" class="value">₦0</div>
+          </div>
+          <div class="card">
+            <div id="lbl-expenses" class="label">Total Expenses</div>
+            <div id="val-expenses" class="value">₦0</div>
+          </div>
+          <div class="card">
+            <div id="lbl-profit" class="label">Profit</div>
+            <div id="val-profit" class="value">₦0</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btn-add-sale" class="big-btn sale">＋ <span id="add-sale-label">Add Sale</span></button>
+          <button id="btn-add-expense" class="big-btn expense">－ <span id="add-expense-label">Add Expense</span></button>
+        </div>
+
+        <div class="chart-card card">
+          <h3 class="center muted">Income vs Expenses (recent)</h3>
+          <canvas id="dashboardChart" height="160"></canvas>
+        </div>
+
+        <div>
+          <h3 id="recent-title">Recent Transactions</h3>
+          <div id="recent-list" class="tx-list muted">
+            <div class="center muted">No transactions yet</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADD SALE -->
+      <section id="add-sale-screen" class="hidden padded">
+        <h2 id="add-sale-title">Record a New Sale</h2>
+        <input id="sale-item" class="large-input" placeholder="Item name (optional)" />
+        <select id="sale-category" class="large-input">
+          <option value="">Category (optional)</option>
+          <option>Goods</option>
+          <option>Services</option>
+          <option>Food</option>
+          <option>Transport</option>
+          <option>Other</option>
+        </select>
+        <input id="sale-amount" class="large-input amount-input" inputmode="numeric" placeholder="₦0" />
+        <button id="save-sale" class="big-btn sale">Save Sale</button>
+        <div class="mt8">
+          <button id="btn-cancel-sale" class="big-btn" style="background:#eee;color:var(--text);">Cancel</button>
+        </div>
+      </section>
+
+      <!-- ADD EXPENSE -->
+      <section id="add-expense-screen" class="hidden padded">
+        <h2 id="add-expense-title">Record a New Expense</h2>
+        <input id="expense-desc" class="large-input" placeholder="Expense description" />
+        <select id="expense-category" class="large-input">
+          <option value="">Category (optional)</option>
+          <option>Supplies</option>
+          <option>Rent</option>
+          <option>Utilities</option>
+          <option>Wages</option>
+          <option>Other</option>
+        </select>
+        <input id="expense-amount" class="large-input amount-input" inputmode="numeric" placeholder="₦0" />
+        <button id="save-expense" class="big-btn expense">Save Expense</button>
+        <div class="mt8">
+          <button id="btn-cancel-expense" class="big-btn" style="background:#eee;color:var(--text);">Cancel</button>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section id="transactions-screen" class="hidden padded">
+        <h2 id="transactions-title">All Transactions</h2>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <button id="btn-export" class="big-btn" style="flex:1;background:#1565c0;">Export CSV</button>
+          <button id="btn-clear-local" class="big-btn" style="flex:1;background:#9e9e9e;">Clear Local</button>
+        </div>
+        <div id="tx-list" class="tx-list muted">
+          <div class="center muted">Loading transactions...</div>
+        </div>
+      </section>
+
+      <!-- TAX -->
+<section id="tax-calculator-screen" class="hidden padded">
+  <h2 id="tax-title" data-i18n="tax_title">Tax Estimator</h2>
+
+  <div class="picker">
+    <button data-range="month" class="range-btn active" data-i18n="range_month">This Month</button>
+    <button data-range="3months" class="range-btn" data-i18n="range_3months">Last 3 Months</button>
+    <button data-range="year" class="range-btn" data-i18n="range_year">This Year</button>
+  </div>
+
+  <div class="tax-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div id="tax-sales-label" class="muted" data-i18n="total_revenue">Total Revenue</div>
+        <div id="tax-sales" style="font-weight:800;font-size:20px;">₦0</div>
+      </div>
+      <div>
+        <div id="tax-profit-label" class="muted" data-i18n="profit">Profit</div>
+        <div id="tax-profit" style="font-weight:800;font-size:20px;">₦0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tax-card">
+    <div id="turnover-text" data-i18n="turnover_text">Estimated Annual Turnover: ₦0</div>
+    <div id="sme-status" class="muted mb8" data-i18n="sme_status">SME Status: -</div>
+    <div id="cit-text" style="font-weight:700;" data-i18n="cit_estimate">CIT Estimate: ₦0</div>
+    <div id="dev-text" style="font-weight:700;" data-i18n="dev_levy_estimate">Development Levy Estimate: ₦0</div>
+  </div>
+
+  <div class="tax-card">
+    <div id="vat-text" style="font-weight:700;" data-i18n="vat_estimate">VAT Estimate (7.5%): ₦0</div>
+    <div class="disclaimer" data-i18n="vat_note">Note: Many basic food items are exempt from VAT. Your actual VAT may be lower.</div>
+  </div>
+
+  <div class="tax-card">
+    <h3 data-i18n="tax_summary_title">Tax Summary</h3>
+    <p data-i18n="tax_summary_text">Your estimated tax based on your records...</p>
+
+    <!-- Pay tax button -->
+    <button id="btn-pay-tax" class="big-btn" style="background: var(--accent); margin-top: 12px;" data-i18n="pay_tax">
+      💳 Pay Your Tax
+    </button>
+  </div>
+</section>
+
+      
+      <!-- SETTINGS -->
+      <section id="settings-screen" class="hidden padded">
+        <h2 id="settings-title">Settings</h2>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button id="btn-lang-en" class="big-btn" style="flex:1;background:#eee;color:var(--text)">English</button>
+          <button id="btn-lang-ha" class="big-btn" style="flex:1;background:#eee;color:var(--text)">Hausa</button>
+        </div>
+
+        <div style="background:#fff;padding:12px;border-radius:10px;">
+          <div id="profile-name" style="font-weight:700;">Name</div>
+          <div id="profile-email" class="muted">email</div>
+
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <input id="profile-edit-name" class="large-input" placeholder="Edit display name" />
+            <button id="btn-save-profile" class="big-btn" style="background:#1565c0;">Save</button>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <label for="currency-select">Currency</label>
+            <select id="currency-select" class="large-input" style="max-width:180px;">
+              <option value="NGN">₦ - NGN</option>
+              <option value="USD">$ - USD</option>
+              <option value="EUR">€ - EUR</option>
+              <option value="GHS">₵ - GHS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt8">
+          <button id="btn-logout" class="big-btn" style="background:#C62828;">Logout</button>
+        </div>
+      </section>
+        
+      <section id="support-screen" class="hidden padded">
+  <h2>Support & Learning Hub</h2>
+  <p class="muted">Need help or want to learn? Explore guides and contact us below.</p>
+
+  <!-- Educational Hub Section -->
+<div class="edu-section">
+  <h3 id="edu-title">📘 Educational Hub</h3>
+  <p id="edu-desc" class="muted">
+    Learn about taxes, small business management, and how to stay financially smart.
+  </p>
+
+  <div class="edu-card">
+    <h4 id="tax-basics-title">💡 Tax Basics</h4>
+    <p id="tax-basics-desc">
+      Understand how business taxes work and how to calculate yours properly.
+    </p>
+    <a href="https://www.firs.gov.ng/" target="_blank">Learn More →</a>
+  </div>
+
+  <div class="edu-card">
+    <h4 id="fin-lit-title">📊 Financial Literacy</h4>
+    <p id="fin-lit-desc">
+      Practical tips to track your sales, manage expenses, and grow your business profitably.
+    </p>
+    <a href="https://www.smetoolkit.ng/" target="_blank">Learn More →</a>
+  </div>
+
+  <div class="edu-card">
+    <h4 id="msme-title">🏢 MSME Support</h4>
+    <p id="msme-desc">
+      Discover government and private initiatives that support small and medium businesses in Nigeria.
+    </p>
+    <a href="https://www.smedan.gov.ng/" target="_blank">Learn More →</a>
+  </div>
+</div>
+
+<!-- Contact/Support Form -->
+<div class="support-contact">
+  <h3 id="contact-support-title">💬 Contact Support</h3>
+  <p id="contact-support-desc" class="muted">
+    Reach out to us for help or questions.
+  </p>
+
+  <button id="btn-open-chat">Open Chat Support</button>
+
+  <div id="support-form" class="hidden padded">
+    <h3>Contact Support</h3>
+    <input id="support-name" class="large-input" placeholder="Your name" />
+    <input id="support-email" class="large-input" placeholder="Your email" />
+    <input id="support-subject" class="large-input" placeholder="Subject (optional)" />
+    <textarea id="support-message" class="large-input" placeholder="Type your message..." rows="4"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button id="btn-send-support" class="big-btn" style="flex:1;background:#1565c0;">Send</button>
+      <button id="btn-cancel-support" class="big-btn" style="flex:1;background:#9e9e9e;">Cancel</button>
+    </div>
+  </div>
+</div>
+</section>
+
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+        <button id="nav-home" class="active"><div>🏠</div><div id="nav-home-label">Home</div></button>
+        <button id="nav-transactions"><div>📜</div><div id="nav-tx-label">Transactions</div></button>
+        <button id="nav-tax"><div>💰</div><div id="nav-tax-label">Tax</div></button>
+        <button id="btn-open-support"><div>💬</div><div id="nav-support-label">Support</div></button>
+        <button id="nav-settings"><div>⚙️</div><div id="nav-settings-label">Settings</div></button>
+    </nav>
+
+  </div>
+
+  <!-- Toasts -->
+  <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Onboarding modal -->
+  <div id="onboard" class="overlay hidden">
+    <div class="onboard-card">
+      <h3>Welcome to Haraji</h3>
+      <p class="muted">Quick tips: Add sales & expenses, check tax estimator, and export CSV for your records.</p>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button id="btn-dismiss-onboard" class="big-btn" style="flex:1;background:#1565c0;">Got it</button>
+        <button id="btn-skip-onboard" class="big-btn" style="flex:1;background:#9e9e9e;">Don't show again</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+  <script src="service-worker.js" defer></script>
+</body>
+</html>
