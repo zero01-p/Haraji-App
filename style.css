@@ -26,7 +26,10 @@ body.dark-mode {
   --card: #101820;
   --muted: #a3b2c2;
 }
-
+.app-logo{
+  width: 2rem;
+  height: 2rem;
+}
 .big-btn {
   width: 100%;
   padding: 16px;
@@ -168,3 +171,4 @@ body.dark-mode nav.bottom-nav { background:#071220; border-top-color:#102132; }
 @media(min-width:480px){
   .app{ margin-top:8px; margin-bottom:8px; box-shadow:0 6px 24px rgba(0,0,0,0.06); border-radius:12px; overflow:hidden; }
 }
+
