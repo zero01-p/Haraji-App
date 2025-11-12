@@ -116,6 +116,3 @@ You can now use and test the Haraji web app locally!
 
 We welcome contributions to Haraji! Please read our CONTRIBUTING.md file for details on our code of conduct, bug reporting, and the process for submitting pull requests.
 
-5. 📝 License
-
-This project is licensed under the MIT License. See the LICENSE file for full details.
